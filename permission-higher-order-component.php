@@ -13,6 +13,8 @@
  * @package           permission-higher-order-component
  */
 
+namespace PoC\Permissions_Higher_Order_Component;
+
 const PLUGIN_PREFIX = 'permission_hoc';
 const PLUGIN_SLUG   = 'permission-higher-order-component';
 const ROOT_DIR      = __DIR__;
@@ -25,7 +27,7 @@ const ROOT_FILE     = __FILE__;
  *
  * @return void
  */
-function permission_hoc_permission_hoc_enqueue_block_editor_assets() : void {
+function enqueue_block_editor_assets() : void {
 
 	$block_editor_asset_path = ROOT_DIR . '/build/index.asset.php';
 
@@ -43,7 +45,7 @@ function permission_hoc_permission_hoc_enqueue_block_editor_assets() : void {
 	 *
 	 * Settings have a filter so other parts of the plugin can append settings.
 	 */
-	$block_settings = apply_filters( PLUGIN_PREFIX . '_block_settings', permission_hoc_permission_hoc_get_block_settings() );
+	$block_settings = apply_filters( PLUGIN_PREFIX . '_block_settings', get_block_settings() );
 
 	wp_enqueue_script(
 		PLUGIN_SLUG . '-block-editor',
@@ -65,14 +67,14 @@ function permission_hoc_permission_hoc_enqueue_block_editor_assets() : void {
 		ROOT_DIR . '\languages'
 	);
 }
-add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\permission_hoc_permission_hoc_enqueue_block_editor_assets', 10 );
+add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_block_editor_assets', 10 );
 
 /**
  * Get Block Settings.
  *
  * Settings for the block.
  */
-function permission_hoc_permission_hoc_get_block_settings() : array {
+function get_block_settings() : array {
 	$user = wp_get_current_user();
 	// Currently gets user roles, we might want permissions instead?
 	return [
@@ -89,7 +91,7 @@ function permission_hoc_permission_hoc_get_block_settings() : array {
  *
  * @return array
  */
-function permission_hoc_permission_hoc_disable_code_editor_for_users( $settings ) {
+function disable_code_editor_for_users( $settings ) {
 	/**
 	 * This will globally remove the code editor view for everyone. We might want to do this
 	 * based on role, or event only if a block on the page is locked down.
@@ -97,4 +99,4 @@ function permission_hoc_permission_hoc_disable_code_editor_for_users( $settings 
 	$settings['codeEditingEnabled'] = 0;
 	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'permission_hoc_permission_hoc_disable_code_editor_for_users', 100 );
+add_filter( 'block_editor_settings_all', __NAMESPACE__ . '\\disable_code_editor_for_users', 100 );
